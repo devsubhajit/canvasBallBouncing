@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>Canvas start and stop</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            .container {width: 800px; height: 400px; margin: 0 auto; border: 2px dotted #498b50;}
+            #mycanvas {border: 1px dotted #000;}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <canvas id="mycanvas" width="800" height="400"></canvas>
+            <input id="start" type="button" value="start">
+            <input id="stop" type="button" value="stop">
+        </div>
+
+        <!--<input id="accle" type="button" value="accelerate">-->
+        <script>
+
+            (function () {
+                var lastTime = 0;
+                var vendors = ['ms', 'moz', 'webkit', 'o'];
+                for (var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
+                    window.requestAnimationFrame = window[vendors[x] + 'RequestAnimationFrame'];
+                    window.cancelAnimationFrame = window[vendors[x] + 'CancelAnimationFrame']
+                            || window[vendors[x] + 'CancelRequestAnimationFrame'];
+                }
+
+                if (!window.requestAnimationFrame)
+                    window.requestAnimationFrame = function (callback, element) {
+                        var currTime = new Date().getTime();
+                        var timeToCall = Math.max(0, 16 - (currTime - lastTime));
+                        var id = window.setTimeout(function () {
+                            callback(currTime + timeToCall);
+                        },
+                                timeToCall);
+                        lastTime = currTime + timeToCall;
+                        return id;
+                    };
+
+                if (!window.cancelAnimationFrame)
+                    window.cancelAnimationFrame = function (id) {
+                        clearTimeout(id);
+                    };
+            }());
+
+
+            (function () {
+
+                // Get the buttons.
+                var startBtn = document.getElementById('start');
+                var stopBtn = document.getElementById('stop');
+//                var acclrt = document.getElementById('accle');
+
+                // A variable to store the requestID.
+                var requestID;
+
+                // Canvas
+                var canvas = document.getElementById("mycanvas");
+                var context = canvas.getContext("2d");
+                var w = canvas.width;
+                var h = canvas.height;
+                var x = 0;
+                var y = 15;
+                var xspeed = 3;
+                var yspeed = 3;
+
+                // Draw the initial box on the canvas.
+                //ctx.fillRect(posX, 0, boxWidth, canvas.height);
+
+
+                // Animate.
+                function animate() {
+                    requestID = requestAnimationFrame(animate);
+                    x += xspeed;
+                    y += yspeed;
+
+                    // If the box has not reached the end draw on the canvas.
+                    // Otherwise stop the animation.
+                    if (x <= 0 || x >= (w - 10)) {
+                        xspeed = -xspeed;
+                    }
+                    if (y <= 0 || y >= (h - 10)) {
+                        yspeed = -yspeed;
+                    }
+                    draw();
+
+
+                    function draw() {
+                        context.save();
+                        context.clearRect(0, 0, w, h);
+                        context.fillStyle = "#0066cc";
+//                    context.fillRect(x, y, 25, 25);
+                        context.beginPath();
+                        context.arc(x, y, 10, 0, Math.PI * 2, true);
+                        context.closePath();
+                        context.fill();
+                    }
+
+                }
+
+                // Event listener for the start button.
+                startBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+
+                    // Start the animation.
+                    requestID = requestAnimationFrame(animate);
+                });
+
+
+                // Event listener for the stop button.
+                stopBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+
+                    // Stop the animation;
+                    cancelAnimationFrame(requestID);
+                });
+
+
+                // Event listener for the acclerate button.
+//                acclrt.addEventListener('click', function (e) {
+//                    e.preventDefault();
+//                    animate();
+//                });
+
+            }());
+
+        </script>
+    </body>
+</html>
